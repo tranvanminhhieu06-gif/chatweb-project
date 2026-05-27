@@ -5,9 +5,15 @@ const cors = require('cors');
 const http = require('http');
 const { Server } = require('socket.io');
 
+const connectDB = require('./config/db');
+const authRoutes = require('./routes/authRoutes');
+const chatRoutes = require('./routes/chatRoutes');
+const roomRoutes = require('./routes/roomRoutes');
 const socketHandler = require('./sockets/socketHandler');
 
 const app = express();
+
+connectDB();
 
 // Middlewares cơ bản
 app.use(cors({
@@ -15,6 +21,10 @@ app.use(cors({
     credentials: true
 }));
 app.use(express.json());
+
+app.use('/api/auth', authRoutes);
+app.use('/api/chat', chatRoutes);
+app.use('/api/rooms', roomRoutes);
 
 // Tạo HTTP Server bằng Express
 const server = http.createServer(app);

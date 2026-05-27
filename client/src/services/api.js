@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-    baseURL: 'https://chatweb-server-hieu.onrender.com/api' // Link Render của bạn + /api
+    baseURL: 'http://localhost:5000/api' // Thay bằng URL Render khi deploy
 });
 
 export default API;

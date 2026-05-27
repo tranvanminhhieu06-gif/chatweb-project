@@ -10,13 +10,15 @@ export const SocketProvider = ({ children }) => {
     useEffect(() => {
         // Lấy thông tin user từ localStorage (được set ở trang Login)
         const storedUser = localStorage.getItem('user');
+        const token = localStorage.getItem('token');
 
-        if (storedUser) {
+        if (storedUser && token) {
             const user = JSON.parse(storedUser);
 
             // Kết nối Socket trực tiếp không cần Token (Phiên bản tối giản)
             // Thay bằng URL thật của bạn nếu deploy, hoặc để io("http://localhost:5000") khi chạy local
             const newSocket = io("http://localhost:5000", { 
+                auth: { token },
                 autoConnect: true 
             });
 
