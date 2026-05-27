@@ -5,7 +5,12 @@ const userSchema = new mongoose.Schema({
     username: { type: String, required: true, trim: true },
     email: { type: String, required: true, unique: true, trim: true, lowercase: true },
     password: { type: String, required: true },
-    avatar: { type: String, default: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix' } // Avatar mặc định nếu không có
+    avatar: { type: String, default: 'https://api.dicebear.com/7.x/adventurer/svg?seed=Felix' }, // Avatar mặc định nếu không có
+    
+    // Profile Fields
+    bannerColor: { type: String, default: '#00f0ff' }, // Mặc định Cyan
+    customStatus: { type: String, default: '' },
+    notes: { type: String, default: '' }
 }, { timestamps: true });
 
 // Tự động mã hóa mật khẩu trước khi lưu vào database

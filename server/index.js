@@ -9,6 +9,7 @@ const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const chatRoutes = require('./routes/chatRoutes');
 const roomRoutes = require('./routes/roomRoutes');
+const userRoutes = require('./routes/userRoutes');
 const socketHandler = require('./sockets/socketHandler');
 
 const app = express();

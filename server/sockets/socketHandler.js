@@ -37,15 +37,32 @@ module.exports = (io) => {
         });
 
         socket.on('send_message', async (data) => {
-            const { room, sender, text } = data;
+            const { room, text } = data; // room is roomName
             try {
-                const newMessage = await Message.create({ room, sender, text });
-                await Room.findOneAndUpdate({ roomName: room }, { lastMessage: newMessage._id });
+                const userId = socket.user.id;
+                
+                let roomDoc = await Room.findOne({ roomName: room });
+                if (!roomDoc) {
+                    roomDoc = await Room.create({ roomName: room });
+                }
+
+                const userDoc = await require('../models/User').findById(userId);
+
+                const newMessage = await Message.create({ room: roomDoc._id, sender: userId, text });
+                await Room.findByIdAndUpdate(roomDoc._id, { lastMessage: newMessage._id });
 
                 const messageToSend = {
                     _id: newMessage._id,
-                    room,
-                    sender,
+                    room: room,
+                    sender: {
+                        _id: userDoc._id,
+                        username: userDoc.username,
+                        avatar: userDoc.avatar,
+                        bannerColor: userDoc.bannerColor,
+                        customStatus: userDoc.customStatus,
+                        notes: userDoc.notes,
+                        createdAt: userDoc.createdAt
+                    },
                     text,
                     createdAt: newMessage.createdAt
                 };

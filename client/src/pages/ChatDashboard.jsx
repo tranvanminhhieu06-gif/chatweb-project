@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../services/api';
+import UserProfileModal from '../components/UserProfileModal';
 
 function ChatDashboard() {
     const socket = useContext(SocketContext);
@@ -15,6 +16,8 @@ function ChatDashboard() {
     const [listOnline, setListOnline] = useState([]);
     const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
     const [typingUser, setTypingUser] = useState('');
+
+    const [selectedUser, setSelectedUser] = useState(null);
 
     const typingTimeoutRef = useRef(null);
     const chatContainerRef = useRef(null);
@@ -159,7 +162,9 @@ function ChatDashboard() {
                         </div>
                     )}
                     {messages.map((msg, index) => {
-                        const isMine = msg.sender === currentUser.username;
+                        const senderUser = typeof msg.sender === 'object' ? msg.sender : { username: msg.sender };
+                        const isMine = senderUser.username === currentUser.username;
+                        
                         return (
                             <div key={msg._id || index} style={{
                                 textAlign: isMine ? 'right' : 'left',
@@ -168,8 +173,13 @@ function ChatDashboard() {
                                 flexDirection: 'column',
                                 alignItems: isMine ? 'flex-end' : 'flex-start'
                             }}>
-                                <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px', padding: '0 4px' }}>
-                                    {isMine ? 'Bạn' : msg.sender}
+                                <span 
+                                    onClick={() => setSelectedUser(senderUser)}
+                                    style={{ 
+                                        fontSize: '12px', color: '#be185d', marginBottom: '4px', padding: '0 4px',
+                                        cursor: 'pointer', fontWeight: 'bold'
+                                    }}>
+                                    {isMine ? 'Bạn' : senderUser.username}
                                 </span>
                                 <span style={{
                                     background: isMine ? 'linear-gradient(135deg, #f472b6, #fb7185)' : '#ffffff',
@@ -211,6 +221,14 @@ function ChatDashboard() {
                     </form>
                 </div>
             </div>
+
+            {selectedUser && (
+                <UserProfileModal 
+                    userProfile={selectedUser}
+                    isOwner={selectedUser.username === currentUser.username}
+                    onClose={() => setSelectedUser(null)}
+                />
+            )}
         </div>
     );
 }
