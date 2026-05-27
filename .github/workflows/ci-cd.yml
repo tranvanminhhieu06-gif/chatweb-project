@@ -1,0 +1,43 @@
+name: Chat Web CI/CD Pipeline
+
+# Lắng nghe sự kiện kích hoạt: Khi có code push lên nhánh main
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  # LỚP 1: CONTINUOUS INTEGRATION (CI) - KIỂM TRA TOÀN DIỆN
+  continuous-integration:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout mã nguồn từ GitHub về máy ảo
+      uses: actions/checkout@v3
+
+    - name: Thiết lập môi trường Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: './server/package-lock.json'
+
+    - name: Kiểm tra và Cài đặt thư viện Backend
+      run: |
+        cd server
+        npm install
+
+    - name: Kiểm tra lỗi cú pháp (Linter/Test)
+      run: |
+        cd server
+        # npm test # Bật lệnh này nếu bạn đã viết các hàm unit test
+
+  # LỚP 2: CONTINUOUS DEPLOYMENT (CD) - TỰ ĐỘNG ĐẨY LÊN INTERNET
+  continuous-deployment:
+    needs: continuous-integration # Chỉ chạy khi tầng kiểm tra CI ở trên thành công 100%
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Kích hoạt lệnh Tự động Deploy sang Render.com
+      # Sử dụng webhook hoặc deploy hook do Render cung cấp công khai
+      run: |
+        curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_BACKEND }}
