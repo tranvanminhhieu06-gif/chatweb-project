@@ -1,34 +1,39 @@
 const Message = require('../models/Message');
 const Room = require('../models/Room');
 
+// Object lưu trữ danh sách user đang online ngầm trên RAM server { userId: socketId }
+const onlineUsers = {};
+
 module.exports = (io) => {
     io.on('connection', (socket) => {
         console.log(`⚡ Kết nối mới: ${socket.id}`);
 
-        // 1. Định danh User khi vừa đăng nhập
+        // 1. ĐỊNH DANH & TRẠNG THÁI ONLINE
         socket.on('setup_user', (userId) => {
             socket.join(userId);
-            console.log(`👤 User [${userId}] đã kích hoạt Socket.`);
+
+            // Lưu userId vào danh sách online
+            onlineUsers[userId] = socket.id;
+
+            // Phát tín hiệu thông báo cho TẤT CẢ mọi người biết user này vừa Online
+            io.emit('user_status_change', { onlineUsers: Object.keys(onlineUsers) });
+            console.log(`🟢 User [${userId}] đang Online.`);
         });
 
-        // 2. Sự kiện khi User bấm chọn một phòng chat cụ thể
+        // 2. PHÂN CHIA PHÒNG CHAT (JOIN ROOM)
         socket.on('join_room', (roomId) => {
-            socket.join(roomId); // Đưa Socket này vào phòng chat chung
-            console.log(`🚪 Phòng chat [${roomId}] vừa có 1 thành viên mở lên.`);
+            // Trước khi vào phòng mới, có thể rời khỏi phòng cũ nếu muốn (tùy chọn tối ưu)
+            socket.join(roomId);
+            console.log(`🚪 Phòng [${roomId}] có thêm kết nối từ: ${socket.id}`);
         });
 
-        // 3. CORE LOGIC: Lắng nghe tin nhắn mới từ Client gửi lên
+        // CORE LOGIC: Nhận và gửi tin nhắn trong phòng chỉ định (io.to)
         socket.on('send_message', async (data) => {
             const { room, sender, text } = data;
-
             try {
-                // Bước A: Lưu tin nhắn trực tiếp vào Database trên đám mây Atlas
                 const newMessage = await Message.create({ room, sender, text });
-
-                // Đồng thời cập nhật tin nhắn cuối cùng cho phòng chat đó
                 await Room.findByIdAndUpdate(room, { lastMessage: newMessage._id });
 
-                // Gộp thêm thông tin thời gian khởi tạo để Client hiển thị
                 const messageToSend = {
                     _id: newMessage._id,
                     room,
@@ -37,15 +42,37 @@ module.exports = (io) => {
                     createdAt: newMessage.createdAt
                 };
 
-                // Bước B: Phát (Emit) tin nhắn này tới TẤT CẢ các thành viên đang có mặt trong phòng
+                // ⚠️ CHỈ PHÁT TIN NHẮN ĐẾN NHỮNG AI ĐANG Ở TRONG PHÒNG NÀY
                 io.to(room).emit('receive_message', messageToSend);
-
             } catch (error) {
-                console.error("Lỗi khi xử lý tin nhắn real-time:", error);
+                console.error("Lỗi gửi tin nhắn:", error);
             }
         });
 
+        // 3. TÍNH NĂNG "AI ĐÓ ĐANG NHẬP TIN NHẮN..."
+        // Lắng nghe khi đang gõ chữ
+        socket.on('typing', (data) => {
+            // Gửi thông báo tới tất cả mọi người TRONG PHÒNG trừ chính người gõ (broadcast)
+            socket.to(data.room).emit('user_typing', { room: data.room, user: data.user });
+        });
+
+        // Lắng nghe khi dừng gõ chữ
+        socket.on('stop_typing', (data) => {
+            socket.to(data.room).emit('user_stop_typing', { room: data.room });
+        });
+
+        // 4. XỬ LÝ KHI NGẮT KẾT NỐI (OFFLINE)
         socket.on('disconnect', () => {
+            // Tìm và xóa userId ra khỏi object onlineUsers khi họ tắt web
+            for (let userId in onlineUsers) {
+                if (onlineUsers[userId] === socket.id) {
+                    delete onlineUsers[userId];
+                    console.log(`🔴 User [${userId}] đã Offline.`);
+                    break;
+                }
+            }
+            // Cập nhật lại danh sách online mới cho các Client khác thay đổi giao diện
+            io.emit('user_status_change', { onlineUsers: Object.keys(onlineUsers) });
             console.log(`❌ Kết nối đóng: ${socket.id}`);
         });
     });
