@@ -16,7 +16,7 @@ export const SocketProvider = ({ children }) => {
             const token = user ? user.token : null; // Bốc tách JWT Token được lưu từ API Đăng nhập
 
             // 1. Gửi kèm Token vào cấu hình 'auth' để vượt qua chốt chặn bảo mật của Server
-            const newSocket = io("http://localhost:5000", {
+            const newSocket = io("https://chatweb-server-hieu.onrender.com", {
                 auth: {
                     token: token
                 },
