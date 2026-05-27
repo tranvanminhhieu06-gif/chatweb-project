@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken');
 const Message = require('../models/Message');
 const Room = require('../models/Room');
 
@@ -5,6 +6,25 @@ const Room = require('../models/Room');
 const onlineUsers = {};
 
 module.exports = (io) => {
+    io.use((socket, next) => {
+        // Lấy token được gửi kèm từ Frontend qua mục auth
+        const token = socket.handshake.auth.token;
+
+        if (!token) {
+            return next(new Error("Authentication error: Không tìm thấy Token bảo mật!"));
+        }
+
+        try {
+            // Giải mã và kiểm tra tính hợp lệ của Token với JWT_SECRET trong file .env
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+            // Gắn thông tin User đã được xác thực trực tiếp vào thực thể socket để các hàm bên dưới dùng luôn
+            socket.user = decoded;
+            next(); // Token hợp lệ, mở cửa cho đi tiếp
+        } catch (err) {
+            return next(new Error("Authentication error: Token không hợp lệ hoặc đã hết hạn!"));
+        }
+    });
     io.on('connection', (socket) => {
         console.log(`⚡ Kết nối mới: ${socket.id}`);
 
