@@ -11,96 +11,95 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 
-<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between">
+<body class="bg-gradient-to-br from-pink-50 via-rose-100 to-pink-50 text-slate-800 min-h-screen flex flex-col justify-between relative overflow-x-hidden font-sans">
 
-    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+    <!-- Thêm nền pattern cánh hoa -->
+    <div class="cherry-blossom-bg fixed inset-0 pointer-events-none z-0"></div>
+
+    <header class="border-b border-pink-200 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between relative z-10">
             <div class="flex items-center space-x-2">
                 <div
-                    class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/30">
+                    class="w-8 h-8 bg-gradient-to-tr from-pink-400 to-rose-400 rounded-xl flex items-center justify-center font-bold text-white shadow-lg shadow-pink-300/50">
                     W</div>
                 <span
-                    class="text-xl font-bold tracking-tight bg-gradient-to-r text-transparent bg-clip-text from-indigo-400 to-cyan-400 animate-gradient-text">ChatWeb</span>
+                    class="text-xl font-bold tracking-tight bg-gradient-to-r text-transparent bg-clip-text from-rose-500 to-pink-500 animate-gradient-text">ChatWeb</span>
             </div>
-            <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-400">
-                <a href="#features" class="hover:text-white transition">Tính năng</a>
-                <a href="#tech" class="hover:text-white transition">Công nghệ</a>
-                <a href="https://github.com" target="_blank" class="hover:text-white transition">GitHub</a>
+            <nav class="hidden md:flex space-x-8 text-sm font-medium text-slate-600">
+                <a href="#features" class="hover:text-rose-500 transition-colors">Tính năng</a>
+                <a href="#tech" class="hover:text-rose-500 transition-colors">Công nghệ</a>
+                <a href="https://github.com" target="_blank" class="hover:text-rose-500 transition-colors">GitHub</a>
             </nav>
             <div>
                 <a href="./index.html"
-                    class="inline-flex items-center justify-center px-4 h-9 text-sm font-semibold rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-lg shadow-indigo-600/20">
+                    class="inline-flex items-center justify-center px-5 h-9 text-sm font-semibold rounded-full bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white transition-all shadow-lg shadow-pink-500/30 hover:shadow-pink-500/50 transform hover:-translate-y-0.5">
                     Thử Ngay
                 </a>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow">
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+    <main class="flex-grow relative z-10">
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-20 text-center">
             <span
-                class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 mb-4 animate-pulse">
-                🚀 Phiên bản Production đã sẵn sàng
+                class="inline-flex items-center px-4 py-1.5 rounded-full text-xs font-medium bg-pink-100 text-rose-600 border border-pink-200 mb-6 animate-pulse shadow-sm">
+                🌸 Giao diện Hoa Anh Đào mới
             </span>
-            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 max-w-3xl mx-auto leading-tight">
-                Kết nối tức thì, bảo mật tuyệt đối với <span
-                    class="bg-gradient-to-r text-transparent bg-clip-text from-indigo-400 via-purple-400 to-pink-400 animate-gradient-text">ChatWeb</span>
+            <h1 class="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 max-w-4xl mx-auto leading-tight text-slate-800">
+                Kết nối tức thì, ngọt ngào như <span
+                    class="bg-gradient-to-r text-transparent bg-clip-text from-rose-400 via-pink-500 to-fuchsia-400 animate-gradient-text">Hoa Anh Đào</span>
             </h1>
-            <p class="text-base sm:text-xl text-slate-400 max-w-2xl mx-auto mb-10 leading-relaxed">
-                Ứng dụng trò chuyện thời gian thực tốc độ cao. Trải nghiệm nhắn tin mượt mà, hỗ trợ chia sẻ đa phương
-                tiện và bảo mật mã hóa thông minh.
+            <p class="text-lg sm:text-2xl text-slate-600 max-w-2xl mx-auto mb-12 leading-relaxed">
+                Trải nghiệm trò chuyện thời gian thực trong không gian lãng mạn, mượt mà và ngập tràn cảm hứng.
             </p>
-            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-5">
                 <a href="./index.html"
-                    class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white transition shadow-xl shadow-indigo-600/30">
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-full bg-gradient-to-r from-rose-400 to-pink-500 hover:from-rose-500 hover:to-pink-600 text-white transition-all shadow-xl shadow-pink-500/40 hover:shadow-pink-500/60 transform hover:-translate-y-1">
                     Bắt đầu trò chuyện
                 </a>
                 <a href="#features"
-                    class="w-full sm:w-auto inline-flex items-center justify-center px-6 py-3 text-base font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 transition border border-slate-700">
-                    Tìm hiểu thêm
+                    class="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 text-lg font-bold rounded-full bg-white hover:bg-pink-50 text-rose-600 transition-all border border-pink-200 shadow-md hover:shadow-lg">
+                    Khám phá thêm
                 </a>
             </div>
         </section>
 
-        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 border-t border-slate-800">
-            <div class="text-center mb-12">
-                <h2 class="text-2xl sm:text-4xl font-bold">Tính Năng Nổi Bật</h2>
-                <p class="text-slate-400 mt-2">Hệ thống được thiết kế tối ưu cho trải nghiệm người dùng</p>
+        <section id="features" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 relative">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl sm:text-5xl font-extrabold text-slate-800">Tính Năng Tinh Tế</h2>
+                <p class="text-rose-500 mt-4 text-lg font-medium">Thiết kế hoàn mỹ, trải nghiệm thăng hoa</p>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div
-                    class="feature-card p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-indigo-500/50 transition">
+                    class="feature-card p-8 bg-white/70 backdrop-blur-xl rounded-3xl border border-white hover:border-pink-300 transition-all shadow-xl shadow-pink-100/50">
                     <div
-                        class="w-10 h-10 bg-indigo-500/10 text-indigo-400 rounded-xl flex items-center justify-center font-bold mb-4">
+                        class="w-14 h-14 bg-gradient-to-br from-rose-100 to-pink-100 text-rose-500 rounded-2xl flex items-center justify-center font-bold mb-6 shadow-sm text-2xl">
                         ⚡</div>
-                    <h3 class="text-lg font-semibold mb-2">Real-time Siêu Tốc</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Tích hợp Socket.io giúp truyền tải tin nhắn, trạng
-                        thái online/offline và hiệu ứng đang nhập văn bản ngay lập tức.</p>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800">Tốc độ gió bay</h3>
+                    <p class="text-base text-slate-600 leading-relaxed">Truyền tải tin nhắn nhanh như cánh hoa rơi trong gió với Socket.io tối ưu hóa.</p>
                 </div>
                 <div
-                    class="feature-card p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-purple-500/50 transition">
+                    class="feature-card p-8 bg-white/70 backdrop-blur-xl rounded-3xl border border-white hover:border-pink-300 transition-all shadow-xl shadow-pink-100/50">
                     <div
-                        class="w-10 h-10 bg-purple-500/10 text-purple-400 rounded-xl flex items-center justify-center font-bold mb-4">
-                        📁</div>
-                    <h3 class="text-lg font-semibold mb-2">Chia Sẻ Đa Phương Tiện</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Hỗ trợ gửi hình ảnh, tệp tin dung lượng lớn mượt
-                        mà nhờ hệ thống lưu trữ đám mây tối ưu hóa.</p>
+                        class="w-14 h-14 bg-gradient-to-br from-fuchsia-100 to-pink-100 text-fuchsia-500 rounded-2xl flex items-center justify-center font-bold mb-6 shadow-sm text-2xl">
+                        🌸</div>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800">Giao diện thơ mộng</h3>
+                    <p class="text-base text-slate-600 leading-relaxed">Tận hưởng không gian thị giác tuyệt đẹp, giảm căng thẳng và tăng cảm hứng kết nối.</p>
                 </div>
                 <div
-                    class="feature-card p-6 bg-slate-800/50 rounded-2xl border border-slate-700/50 hover:border-pink-500/50 transition">
+                    class="feature-card p-8 bg-white/70 backdrop-blur-xl rounded-3xl border border-white hover:border-pink-300 transition-all shadow-xl shadow-pink-100/50">
                     <div
-                        class="w-10 h-10 bg-pink-500/10 text-pink-400 rounded-xl flex items-center justify-center font-bold mb-4">
+                        class="w-14 h-14 bg-gradient-to-br from-pink-100 to-rose-100 text-pink-500 rounded-2xl flex items-center justify-center font-bold mb-6 shadow-sm text-2xl">
                         🔒</div>
-                    <h3 class="text-lg font-semibold mb-2">Bảo Mật Cơ Sở Dữ Liệu</h3>
-                    <p class="text-sm text-slate-400 leading-relaxed">Xác thực người dùng qua JWT Token kết hợp mã hóa
-                        mật khẩu nhiều lớp, bảo vệ tuyệt đối hộp thư của bạn.</p>
+                    <h3 class="text-xl font-bold mb-3 text-slate-800">Bảo mật vững chắc</h3>
+                    <p class="text-base text-slate-600 leading-relaxed">Mã hóa an toàn tuyệt đối, giữ trọn vẹn những câu chuyện riêng tư của bạn.</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <footer class="border-t border-slate-800 bg-slate-950/50 py-6 text-center text-sm text-slate-500">
-        <p>&copy; 2026 ChatWeb Project. Được phát triển với tất cả tâm huyết.</p>
+    <footer class="border-t border-pink-200 bg-white/50 backdrop-blur-sm py-8 text-center text-sm text-slate-500 relative z-10">
+        <p>&copy; 2026 ChatWeb Project. Nở rộ cùng Hoa Anh Đào.</p>
     </footer>
 
 </body>

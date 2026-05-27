@@ -8,43 +8,35 @@ export const SocketProvider = ({ children }) => {
     const [socket, setSocket] = useState(null);
 
     useEffect(() => {
-        // Kiểm tra xem người dùng đã đăng nhập chưa từ localStorage
+        // Lấy thông tin user từ localStorage (được set ở trang Login)
         const storedUser = localStorage.getItem('user');
 
         if (storedUser) {
             const user = JSON.parse(storedUser);
-            const token = user ? user.token : null; // Bốc tách JWT Token được lưu từ API Đăng nhập
 
-            // 1. Gửi kèm Token vào cấu hình 'auth' để vượt qua chốt chặn bảo mật của Server
-            const newSocket = io("https://chatweb-server-hieu.onrender.com", {
-                auth: {
-                    token: token
-                },
-                autoConnect: true // Tự động kích hoạt kết nối an toàn
+            // Kết nối Socket trực tiếp không cần Token (Phiên bản tối giản)
+            // Thay bằng URL thật của bạn nếu deploy, hoặc để io("http://localhost:5000") khi chạy local
+            const newSocket = io("http://localhost:5000", { 
+                autoConnect: true 
             });
 
             setSocket(newSocket);
 
-            // 2. CHUẨN HOÁ LOGIC: Đợi Socket kết nối thành công (Xác thực JWT xong) rồi mới định danh user
             newSocket.on('connect', () => {
-                console.log('📶 Socket đã vượt qua kiểm tra JWT và kết nối thành công!');
-                newSocket.emit('setup_user', user.id);
+                console.log('📶 Socket kết nối thành công!');
+                newSocket.emit('setup_user', user.username);
             });
 
-            // Lắng nghe nếu có lỗi xác thực (Token sai hoặc hết hạn) trả về từ Middleware Server
             newSocket.on('connect_error', (err) => {
-                console.error('🔒 Lỗi bảo mật Socket:', err.message);
-                // Bạn có thể xử lý xóa localStorage hoặc đá user về trang Login ở đây nếu Token hết hạn
+                console.error('🔒 Lỗi kết nối Socket:', err.message);
             });
 
-            // Hàm dọn dẹp (cleanup): Tự động ngắt kết nối Socket khi người dùng tắt ứng dụng
             return () => {
                 newSocket.off('connect');
                 newSocket.off('connect_error');
                 newSocket.disconnect();
             };
         } else {
-            // Nếu không tìm thấy thông tin đăng nhập, đảm bảo Socket cũ đã được ngắt kết nối hoàn toàn
             if (socket) {
                 socket.disconnect();
                 setSocket(null);
@@ -53,7 +45,6 @@ export const SocketProvider = ({ children }) => {
     }, []); // Chạy 1 lần duy nhất khi ứng dụng được tải lên lần đầu
 
     return (
-        // Chia sẻ thực thể 'socket' này cho toàn bộ hệ thống Frontend sử dụng
         <SocketContext.Provider value={socket}>
             {children}
         </SocketContext.Provider>

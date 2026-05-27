@@ -1,78 +1,47 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
 import { SocketContext } from '../context/SocketContext';
-import API from '../services/api'; // Đảm bảo đã import instance axios của bạn
-import axios from 'axios'; // Dùng cho hàm upload ảnh lên Cloudinary
+import { useNavigate } from 'react-router-dom';
 
 function ChatDashboard() {
     const socket = useContext(SocketContext);
+    const navigate = useNavigate();
 
-    // Khởi tạo thông tin cá nhân từ localStorage
-    const [currentUser, setCurrentUser] = useState(() => {
-        return JSON.parse(localStorage.getItem('user')) || { id: 'ANON', username: 'Ẩn danh' };
-    });
-
-    const [currentRoomId, setCurrentRoomId] = useState('ROOM_ID_TEST_123');
+    const [currentUser, setCurrentUser] = useState(null);
+    const [currentRoomId, setCurrentRoomId] = useState('');
     const [messages, setMessages] = useState([]);
     const [textInput, setTextInput] = useState('');
 
-    // Các State quản lý trạng thái Real-time (Giai đoạn 6)
     const [listOnline, setListOnline] = useState([]);
     const [isSomeoneTyping, setIsSomeoneTyping] = useState(false);
     const [typingUser, setTypingUser] = useState('');
 
-    // Các State & Ref quản lý Cuộn vô hạn (Giai đoạn 7)
     const typingTimeoutRef = useRef(null);
     const chatContainerRef = useRef(null);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    // 📄 HÀM TẢI LỊCH SỬ TIN NHẮN GỐI ĐẦU (Infinite Scroll)
-    const loadMoreMessages = async () => {
-        if (isLoadingMore || !hasMore || messages.length === 0) return;
+    // Lấy thông tin từ localStorage khi vừa vào trang
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        const storedRoom = localStorage.getItem('room');
 
-        setIsLoadingMore(true);
-        const oldestMessageTime = messages[0].createdAt;
-
-        try {
-            const res = await API.get(`/chat/messages/${currentRoomId}?before=${oldestMessageTime}`);
-
-            if (res.data.length === 0) {
-                setHasMore(false);
-                return;
-            }
-
-            // Lưu lại chiều cao khung chat trước khi đắp dữ liệu mới
-            const previousScrollHeight = chatContainerRef.current.scrollHeight;
-
-            setMessages((prevMessages) => [...res.data, ...prevMessages]);
-
-            // Giữ nguyên vị trí cuộn màn hình cho người dùng
-            setTimeout(() => {
-                if (chatContainerRef.current) {
-                    chatContainerRef.current.scrollTop =
-                        chatContainerRef.current.scrollHeight - previousScrollHeight;
-                }
-            }, 0);
-
-        } catch (error) {
-            console.error('Lỗi khi tải gối đầu lịch sử tin nhắn:', error);
-        } finally {
-            setIsLoadingMore(false);
+        if (!storedUser || !storedRoom) {
+            navigate('/login');
+            return;
         }
-    };
 
-    // Hàm bắt sự kiện cuộn chuột
-    const handleScroll = () => {
-        if (!chatContainerRef.current) return;
+        setCurrentUser(JSON.parse(storedUser));
+        setCurrentRoomId(storedRoom);
+    }, [navigate]);
 
-        if (chatContainerRef.current.scrollTop === 0) {
-            loadMoreMessages();
+    // Cuộn tự động xuống cuối khi có tin nhắn mới
+    useEffect(() => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTop = chatContainerRef.current.scrollHeight;
         }
-    };
+    }, [messages, isSomeoneTyping]);
 
     // 📡 ĐĂNG KÝ CÁC CỔNG LẮNG NGHE SOCKET.IO
     useEffect(() => {
-        if (!socket) return;
+        if (!socket || !currentRoomId) return;
 
         socket.emit('join_room', currentRoomId);
 
@@ -106,10 +75,9 @@ function ChatDashboard() {
         };
     }, [socket, currentRoomId]);
 
-    // ✍️ XỬ LÝ DEBOUNCE KHI GÕ CHỮ (Typing Indicator)
     const handleInputChange = (e) => {
         setTextInput(e.target.value);
-        if (!socket) return;
+        if (!socket || !currentUser) return;
 
         socket.emit('typing', { room: currentRoomId, user: currentUser.username });
 
@@ -120,146 +88,119 @@ function ChatDashboard() {
         }, 1500);
     };
 
-    // 📸 XỬ LÝ UPLOAD VÀ GỬI ẢNH QUA CLOUDINARY
-    const handleUploadImage = async (e) => {
-        const file = e.target.files[0];
-        if (!file || !socket) return;
-
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'ml_default'); // Thay bằng upload preset Unsigned của bạn
-
-        try {
-            const cloudName = 'duomsfguv'; // Thay bằng Cloud Name trên Atlas/Cloudinary của bạn
-            const res = await axios.post(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, formData);
-
-            const imageUrl = res.data.secure_url;
-
-            socket.emit('send_message', {
-                room: currentRoomId,
-                sender: currentUser.id,
-                text: imageUrl,
-                isImage: true
-            });
-        } catch (error) {
-            console.error('Lỗi khi tải ảnh lên Cloudinary:', error);
-        }
-    };
-
-    // LÈNH GỬI TIN NHẮN CHỮ THÔNG THƯỜNG
     const handleSendMessage = (e) => {
         e.preventDefault();
-        if (!textInput.trim() || !socket) return;
+        if (!textInput.trim() || !socket || !currentUser) return;
 
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
         socket.emit('stop_typing', { room: currentRoomId });
 
         socket.emit('send_message', {
             room: currentRoomId,
-            sender: currentUser.id,
+            sender: currentUser.username,
             text: textInput
         });
 
         setTextInput('');
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        localStorage.removeItem('room');
+        if (socket) {
+            socket.disconnect();
+        }
+        navigate('/login');
+    };
+
+    if (!currentUser) return <div>Đang tải...</div>;
+
     return (
-        <div style={{ display: 'flex', height: '100vh', fontFamily: 'Arial, sans-serif' }}>
-            {/* 1. Sidebar trái: Danh sách phòng & Trạng thái bạn bè */}
-            <div style={{ width: '30%', borderRight: '1px solid #ccc', padding: '15px', background: '#f5f7fb' }}>
-                <h3>Phòng Chat & Bạn Bè</h3>
-                <div style={{ padding: '12px', background: '#fff', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)', cursor: 'pointer', marginBottom: '10px' }}>
-                    🟢 <b>Phòng Test Hệ Thống</b>
+        <div style={{ display: 'flex', height: '100vh', fontFamily: "'Inter', sans-serif", background: '#fdf2f8', color: '#334155' }}>
+            {/* 1. Sidebar trái */}
+            <div style={{ width: '30%', borderRight: '1px solid #fbcfe8', padding: '20px', background: 'linear-gradient(to bottom, #fff0f5, #ffe4e1)', display: 'flex', flexDirection: 'column' }}>
+                <div style={{ paddingBottom: '20px', borderBottom: '1px solid #fbcfe8', marginBottom: '20px' }}>
+                    <h3 style={{ margin: '0 0 10px 0', color: '#be185d' }}>Xin chào, {currentUser.username}!</h3>
+                    <button onClick={handleLogout} style={{ padding: '8px 16px', background: '#fff', color: '#be185d', border: '1px solid #fbcfe8', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold' }}>Rời phòng</button>
+                </div>
+                
+                <h3 style={{ margin: '0 0 10px 0' }}>Phòng Đang Tham Gia</h3>
+                <div style={{ padding: '15px', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(244,114,182,0.1)', cursor: 'pointer', marginBottom: '20px', border: '1px solid #fbcfe8', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '24px' }}>🌸</span> 
+                    <b style={{ color: '#be185d', fontSize: '16px' }}>{currentRoomId}</b>
                 </div>
 
-                <h4 style={{ marginTop: '20px' }}>Thành viên trực tuyến:</h4>
-                <ul>
-                    {listOnline.map((id) => (
-                        <li key={id} style={{ color: 'green', margin: '5px 0' }}>
-                            👤 {id === currentUser.id ? "Bạn (Đang chạy)" : `User: ${id.substring(0, 5)}...`}
-                        </li>
-                    ))}
-                </ul>
+                <h4 style={{ marginTop: 'auto', marginBottom: '10px' }}>Trạng thái server:</h4>
+                <div style={{ fontSize: '12px', color: '#888' }}>
+                    *Đây là phòng chat thời gian thực riêng tư. Tin nhắn sẽ không được lưu lại khi tải lại trang để đảm bảo bảo mật.
+                </div>
             </div>
 
             {/* 2. Khung Chat phải */}
-            <div style={{ width: '70%', display: 'flex', flexDirection: 'column', padding: '15px' }}>
-                <div style={{ paddingBottom: '10px', borderBottom: '1px solid #eee' }}>
-                    <h2>Hộp Thoại Real-time</h2>
+            <div style={{ width: '70%', display: 'flex', flexDirection: 'column', padding: '20px' }}>
+                <div style={{ paddingBottom: '15px', borderBottom: '1px solid #fbcfe8', marginBottom: '15px' }}>
+                    <h2 style={{ margin: 0, color: '#be185d' }}>Khu Vực Trò Chuyện</h2>
                 </div>
 
-                {/* Khu vực hiển thị tin nhắn (Gắn Ref và sự kiện cuộn chuột ở đây) */}
+                {/* Khu vực hiển thị tin nhắn */}
                 <div
                     ref={chatContainerRef}
-                    onScroll={handleScroll}
-                    style={{ flex: 1, border: '1px solid #ddd', borderRadius: '8px', padding: '15px', overflowY: 'auto', marginBottom: '10px', background: '#fafafa' }}
+                    style={{ flex: 1, border: '1px solid #fbcfe8', borderRadius: '16px', padding: '20px', overflowY: 'auto', marginBottom: '20px', background: 'rgba(255, 255, 255, 0.7)', backdropFilter: 'blur(10px)', boxShadow: 'inset 0 2px 10px rgba(251, 207, 232, 0.3)' }}
                 >
-                    {/* Hiển thị dòng trạng thái loading gối đầu */}
-                    {isLoadingMore && (
-                        <div style={{ textAlign: 'center', color: '#888', fontSize: '13px', margin: '5px 0' }}>
-                            🔄 Đang tải tin nhắn cũ...
+                    {messages.length === 0 && (
+                        <div style={{ textAlign: 'center', color: '#94a3b8', marginTop: '50px' }}>
+                            🌸 Chưa có tin nhắn nào. Hãy là người đầu tiên gửi lời chào!
                         </div>
                     )}
-
-                    {messages.map((msg, index) => (
-                        <div key={msg._id || index} style={{
-                            textAlign: msg.sender === currentUser.id ? 'right' : 'left',
-                            margin: '8px 0'
-                        }}>
-                            {/* KIỂM TRA ĐIỀU KIỆN RENDER: Nếu là ảnh thì render thẻ <img>, ngược lại render text <span> */}
-                            {msg.isImage ? (
-                                <img
-                                    src={msg.text}
-                                    alt="Sent content"
-                                    style={{ maxWidth: '250px', borderRadius: '8px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', display: 'inline-block' }}
-                                />
-                            ) : (
+                    {messages.map((msg, index) => {
+                        const isMine = msg.sender === currentUser.username;
+                        return (
+                            <div key={msg._id || index} style={{
+                                textAlign: isMine ? 'right' : 'left',
+                                margin: '12px 0',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: isMine ? 'flex-end' : 'flex-start'
+                            }}>
+                                <span style={{ fontSize: '12px', color: '#94a3b8', marginBottom: '4px', padding: '0 4px' }}>
+                                    {isMine ? 'Bạn' : msg.sender}
+                                </span>
                                 <span style={{
-                                    background: msg.sender === currentUser.id ? '#007bff' : '#fff',
-                                    color: msg.sender === currentUser.id ? '#fff' : '#333',
-                                    padding: '10px 14px',
-                                    borderRadius: '12px',
+                                    background: isMine ? 'linear-gradient(135deg, #f472b6, #fb7185)' : '#ffffff',
+                                    color: isMine ? '#fff' : '#475569',
+                                    padding: '12px 18px',
+                                    borderRadius: isMine ? '16px 16px 0 16px' : '16px 16px 16px 0',
                                     display: 'inline-block',
-                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)',
-                                    border: msg.sender === currentUser.id ? 'none' : '1px solid #e0e0e0'
+                                    boxShadow: '0 4px 6px rgba(251, 207, 232, 0.4)',
+                                    border: isMine ? 'none' : '1px solid #fbcfe8',
+                                    maxWidth: '70%',
+                                    wordWrap: 'break-word'
                                 }}>
                                     {msg.text}
                                 </span>
-                            )}
-                        </div>
-                    ))}
+                            </div>
+                        );
+                    })}
 
-                    {/* HIỂN THỊ HIỆU ỨNG TYPING INDICATOR */}
                     {isSomeoneTyping && (
-                        <div style={{ textAlign: 'left', color: '#888', fontStyle: 'italic', margin: '10px 0' }}>
-                            ✍️ {typingUser} đang gõ tin nhắn...
+                        <div style={{ textAlign: 'left', color: '#f472b6', fontStyle: 'italic', margin: '10px 0', fontSize: '13px' }}>
+                            🌸 {typingUser} đang gõ...
                         </div>
                     )}
                 </div>
 
-                {/* Thanh điều khiển gõ tin và Đính kèm đa phương tiện */}
-                <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                    {/* Nút đính kèm hình ảnh */}
-                    <label style={{ background: '#eee', padding: '12px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                        📷 Ảnh
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleUploadImage}
-                            style={{ display: 'none' }}
-                        />
-                    </label>
-
-                    <form onSubmit={handleSendMessage} style={{ display: 'flex', flex: 1, gap: '10px' }}>
+                {/* Thanh điều khiển gõ tin */}
+                <div>
+                    <form onSubmit={handleSendMessage} style={{ display: 'flex', gap: '15px' }}>
                         <input
                             type="text"
                             value={textInput}
                             onChange={handleInputChange}
-                            placeholder="Nhập nội dung tin nhắn..."
-                            style={{ flex: 1, padding: '12px', borderRadius: '6px', border: '1px solid #ccc' }}
+                            placeholder="Nhập tin nhắn ngọt ngào..."
+                            style={{ flex: 1, padding: '16px 20px', borderRadius: '12px', border: '1px solid #fbcfe8', outline: 'none', background: '#fff', boxShadow: '0 4px 10px rgba(251,207,232,0.2)', fontSize: '15px' }}
                         />
-                        <button type="submit" style={{ padding: '12px 24px', background: '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}>
-                            Gửi đi
+                        <button type="submit" style={{ padding: '0 30px', background: 'linear-gradient(to right, #fb7185, #f472b6)', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 10px rgba(244, 114, 182, 0.3)', transition: 'transform 0.2s', fontSize: '15px' }}>
+                            Gửi
                         </button>
                     </form>
                 </div>

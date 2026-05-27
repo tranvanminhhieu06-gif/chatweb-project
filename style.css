@@ -3,37 +3,37 @@ html {
     scroll-behavior: smooth;
 }
 
-/* 2. Tùy biến thanh cuộn (Scrollbar) chuẩn Dark Mode */
+/* 2. Tùy biến thanh cuộn (Scrollbar) chuẩn Cherry Blossom */
 ::-webkit-scrollbar {
     width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #0f172a;
-    /* Màu nền của thanh cuộn (slate-900) */
+    background: #fdf2f8;
+    /* pink-50 */
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #334155;
-    /* Màu của con lăn (slate-700) */
+    background: #fbcfe8;
+    /* pink-200 */
     border-radius: 9999px;
-    border: 2px solid #0f172a;
+    border: 2px solid #fdf2f8;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #4f46e5;
-    /* Đổi sang màu Indigo khi di chuột vào */
+    background: #f472b6;
+    /* pink-400 */
 }
 
 /* 3. Hiệu ứng phát sáng và nổi lên (Glow & Hover) cho các thẻ tính năng */
 .feature-card {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .feature-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 25px -5px rgba(79, 70, 229, 0.2),
-        0 10px 10px -5px rgba(6, 182, 212, 0.1);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 30px -5px rgba(244, 114, 182, 0.3),
+        0 15px 15px -5px rgba(225, 29, 72, 0.1);
 }
 
 /* 4. Hiệu ứng chữ đổi màu động (Gradient Text Animation) */
@@ -54,4 +54,18 @@ html {
 .animate-gradient-text {
     background-size: 200% auto;
     animation: textShine 4s linear infinite;
+}
+
+/* 5. Cánh hoa anh đào rơi (Mô phỏng nhẹ nhàng nền) */
+.cherry-blossom-bg {
+    background-image: radial-gradient(#fbcfe8 1px, transparent 1px), radial-gradient(#fce7f3 2px, transparent 2px);
+    background-size: 60px 60px;
+    background-position: 0 0, 30px 30px;
+    opacity: 0.6;
+    animation: floatingBackground 40s linear infinite;
+}
+
+@keyframes floatingBackground {
+    0% { background-position: 0 0, 30px 30px; }
+    100% { background-position: 600px 600px, 630px 630px; }
 }
