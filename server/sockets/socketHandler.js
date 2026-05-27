@@ -33,6 +33,7 @@ module.exports = (io) => {
         socket.on('join_room', (roomId) => {
             socket.join(roomId);
             console.log(`🚪 Phòng [${roomId}] có thêm kết nối từ: ${socket.id}`);
+            socket.emit('user_status_change', { onlineUsers: Object.keys(onlineUsers) });
         });
 
         socket.on('send_message', async (data) => {

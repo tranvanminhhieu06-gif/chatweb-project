@@ -96,7 +96,7 @@ function ChatDashboard() {
     };
 
     const handleSendMessage = (e) => {
-        e.preventDefault();
+        if (e && e.preventDefault) e.preventDefault();
         if (!textInput.trim() || !socket || !currentUser) return;
 
         if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
@@ -109,6 +109,13 @@ function ChatDashboard() {
         });
 
         setTextInput('');
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleSendMessage(e);
+        }
     };
 
     const handleBack = () => {
@@ -194,6 +201,7 @@ function ChatDashboard() {
                             type="text"
                             value={textInput}
                             onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
                             placeholder="Nhập tin nhắn ngọt ngào..."
                             style={{ flex: 1, padding: '16px 20px', borderRadius: '12px', border: '1px solid #fbcfe8', outline: 'none', background: '#fff', boxShadow: '0 4px 10px rgba(251,207,232,0.2)', fontSize: '15px' }}
                         />
