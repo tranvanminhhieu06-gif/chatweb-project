@@ -3,6 +3,7 @@ import { SocketContext } from '../context/SocketContext';
 import { useNavigate, useParams } from 'react-router-dom';
 import API from '../services/api';
 import UserProfileModal from '../components/UserProfileModal';
+import TopMenu from '../components/TopMenu';
 
 function ChatDashboard() {
     const socket = useContext(SocketContext);
@@ -128,12 +129,13 @@ function ChatDashboard() {
     if (!currentUser) return <div>Đang tải...</div>;
 
     return (
-        <div style={{ display: 'flex', height: '100vh', fontFamily: "'Inter', sans-serif", background: '#fdf2f8', color: '#334155' }}>
-            <div style={{ width: '30%', borderRight: '1px solid #fbcfe8', padding: '20px', background: 'linear-gradient(to bottom, #fff0f5, #ffe4e1)', display: 'flex', flexDirection: 'column' }}>
-                <div style={{ paddingBottom: '20px', borderBottom: '1px solid #fbcfe8', marginBottom: '20px' }}>
-                    <button onClick={handleBack} style={{ padding: '8px 16px', background: '#fff', color: '#be185d', border: '1px solid #fbcfe8', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold', marginBottom: '15px' }}>⬅ Trở về danh sách</button>
-                    <h3 style={{ margin: '0 0 10px 0', color: '#be185d' }}>Xin chào, {currentUser.username}!</h3>
-                </div>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', fontFamily: "'Inter', sans-serif", background: '#fdf2f8', color: '#334155' }}>
+            <TopMenu />
+            <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
+                <div style={{ width: '30%', borderRight: '1px solid #fbcfe8', padding: '20px', background: 'linear-gradient(to bottom, #fff0f5, #ffe4e1)', display: 'flex', flexDirection: 'column', overflowY: 'auto' }}>
+                    <div style={{ paddingBottom: '20px', borderBottom: '1px solid #fbcfe8', marginBottom: '20px' }}>
+                        <button onClick={handleBack} style={{ padding: '8px 16px', background: '#fff', color: '#be185d', border: '1px solid #fbcfe8', borderRadius: '8px', cursor: 'pointer', fontSize: '12px', fontWeight: 'bold', marginBottom: '15px' }}>⬅ Trở về danh sách</button>
+                    </div>
                 
                 <h3 style={{ margin: '0 0 10px 0' }}>Phòng Đang Tham Gia</h3>
                 <div style={{ padding: '15px', background: '#fff', borderRadius: '12px', boxShadow: '0 2px 8px rgba(244,114,182,0.1)', cursor: 'pointer', marginBottom: '20px', border: '1px solid #fbcfe8', display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -220,6 +222,7 @@ function ChatDashboard() {
                         </button>
                     </form>
                 </div>
+            </div>
             </div>
 
             {selectedUser && (

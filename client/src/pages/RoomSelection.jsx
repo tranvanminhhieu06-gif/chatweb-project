@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import API from '../services/api';
+import TopMenu from '../components/TopMenu';
 
 function RoomSelection() {
     const [rooms, setRooms] = useState([]);
@@ -60,18 +61,19 @@ function RoomSelection() {
     const user = JSON.parse(localStorage.getItem('user') || '{}');
 
     return (
-        <div style={{ minHeight: '100vh', padding: '40px 20px', background: 'linear-gradient(to bottom right, #fdf2f8, #fce7f3, #fdf2f8)', fontFamily: "'Inter', sans-serif" }}>
-            <div style={{ maxWidth: '800px', margin: '0 auto' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', background: 'rgba(255, 255, 255, 0.8)', padding: '20px', borderRadius: '16px', boxShadow: '0 4px 15px rgba(244, 114, 182, 0.1)', border: '1px solid #fbcfe8' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+        <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #fdf2f8, #fce7f3, #fdf2f8)', fontFamily: "'Inter', sans-serif" }}>
+            <TopMenu />
+            
+            <div style={{ padding: '40px 20px' }}>
+                <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+                    
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
                         <span style={{ fontSize: '32px' }}>🌸</span>
                         <div>
-                            <h2 style={{ margin: 0, color: '#be185d' }}>Xin chào, {user.username}!</h2>
-                            <p style={{ margin: '5px 0 0 0', color: '#ec4899', fontSize: '14px' }}>Chọn phòng hoặc tạo phòng mới</p>
+                            <h2 style={{ margin: 0, color: '#be185d' }}>Sảnh chờ của {user.username}</h2>
+                            <p style={{ margin: '5px 0 0 0', color: '#ec4899', fontSize: '14px' }}>Chọn phòng hoặc tạo phòng mới để bắt đầu trò chuyện</p>
                         </div>
                     </div>
-                    <button onClick={handleLogout} style={{ padding: '10px 20px', background: '#fff', color: '#be185d', border: '1px solid #fbcfe8', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 2px 5px rgba(244, 114, 182, 0.1)', transition: 'all 0.2s' }}>Đăng xuất</button>
-                </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '30px' }}>
                     {/* Panel Tạo phòng mới */}
@@ -114,6 +116,8 @@ function RoomSelection() {
                             </div>
                         )}
                     </div>
+                </div>
+            </div>
                 </div>
             </div>
         </div>
