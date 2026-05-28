@@ -118,8 +118,6 @@ function RoomSelection() {
                     </div>
                 </div>
             </div>
-                </div>
-            </div>
         </div>
     );
 }
